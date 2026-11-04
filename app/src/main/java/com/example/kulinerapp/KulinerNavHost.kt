@@ -8,14 +8,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.example.kulinerapp.ui.CatalogViewModel
+import com.example.kulinerapp.ui.DetailScreen
 import com.example.kulinerapp.ui.FormScreen
+import com.example.kulinerapp.ui.HomeScreen
 
 @Composable
 fun KulinerNavHost(
     navController: NavHostController,
     viewModel: CatalogViewModel
 ) {
-    // Mengonsumsi state menggunakan lifecycle-aware collection (Standar Pertemuan 6)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     NavHost(
@@ -25,8 +26,8 @@ fun KulinerNavHost(
         // 1. Home Destination
         composable<Screen.Home> {
             HomeScreen(
-                kulinerList = uiState.kulinerList, // Pass the list from uiState
-                onItemClick = { kulinerId ->          // Match HomeScreen's onItemClick parameter
+                uiState = uiState,
+                onKulinerClick = { kulinerId ->
                     navController.navigate(Screen.Detail(kulinerId = kulinerId))
                 },
                 onAddClick = {
@@ -38,7 +39,6 @@ fun KulinerNavHost(
         // 2. Detail Destination
         composable<Screen.Detail> { backStackEntry ->
             val route: Screen.Detail = backStackEntry.toRoute()
-            // Menangani non-happy path / invalid ID sesuai ketentuan tugas
             val selectedKuliner = uiState.kulinerList.find { it.id == route.kulinerId }
 
             DetailScreen(
@@ -47,7 +47,7 @@ fun KulinerNavHost(
             )
         }
 
-        // 3. Form Destination (Menerima callback, tanpa memegang NavController langsung di ViewModel)
+        // 3. Form Destination
         composable<Screen.Form> {
             FormScreen(
                 onBackClick = { navController.popBackStack() },

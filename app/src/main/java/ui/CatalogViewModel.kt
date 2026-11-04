@@ -15,7 +15,6 @@ class CatalogViewModel : ViewModel() {
     }
 
     private fun loadInitialData() {
-        // Mengisi data awal kuliner beserta deskripsinya agar sesuai dengan model
         val initialList = listOf(
             Kuliner(
                 id = 1,
