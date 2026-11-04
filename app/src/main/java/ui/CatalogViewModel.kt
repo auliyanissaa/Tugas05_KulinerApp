@@ -1,31 +1,46 @@
 package com.example.kulinerapp.ui
-
-import androidx.lifecycle.ViewModel
 import com.example.kulinerapp.Kuliner
+import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 class CatalogViewModel : ViewModel() {
-
-    // MutableStateFlow private agar hanya ViewModel yang bisa mengubah isinya (UDF principle)
     private val _uiState = MutableStateFlow(CatalogUiState())
-
-    // StateFlow read-only yang akan dibaca oleh Compose UI
     val uiState: StateFlow<CatalogUiState> = _uiState.asStateFlow()
 
     init {
-        // Memuat data awal kuliner (mengambil data dari data list yang sudah ada)
         loadInitialData()
     }
 
     private fun loadInitialData() {
-        // Contoh data awal kuliner Jakarta (bisa disesuaikan dengan data kuliner kamu sebelumnya)
+        // Mengisi data awal kuliner beserta deskripsinya agar sesuai dengan model
         val initialList = listOf(
-            Kuliner(id = 1, nama = "Nasi Goreng Kambing Kebon Sirih", kategori = "Makanan Berat", harga = 35000, lokasi = "Menteng, Jakarta Pusat"),
-            Kuliner(id = 2, nama = "Soto Betawi H. Husein", kategori = "Makanan Berat", harga = 40000, lokasi = "Manggarai, Jakarta Selatan"),
-            Kuliner(id = 3, nama = "Kerak Telor Kemayoran", kategori = "Camilan", harga = 25000, lokasi = "Kemayoran, Jakarta Pusat")
+            Kuliner(
+                id = 1,
+                nama = "Kambing Kebon Sirih",
+                kategori = "Makanan Berat",
+                harga = 35000,
+                lokasi = "Menteng, Jakarta Pusat",
+                deskripsi = "Sate dan gulai kambing legendaris yang empuk dan kaya rempah."
+            ),
+            Kuliner(
+                id = 2,
+                nama = "Soto H. Husein",
+                kategori = "Makanan Berat",
+                harga = 40000,
+                lokasi = "Manggarai, Jakarta Selatan",
+                deskripsi = "Soto tangkar sapi legendaris dengan kuah santan gurih."
+            ),
+            Kuliner(
+                id = 3,
+                nama = "Bubur Kemayoran",
+                kategori = "Camilan",
+                harga = 25000,
+                lokasi = "Kemayoran, Jakarta Pusat",
+                deskripsi = "Bubur ayam hangat dengan suwiran ayam melimpah."
+            )
         )
 
         _uiState.update { currentState ->
@@ -33,28 +48,18 @@ class CatalogViewModel : ViewModel() {
         }
     }
 
-    // Contoh event untuk memperbarui pencarian/filter
-    fun onSearchQueryChanged(query: String) {
-        _uiState.update { currentState ->
-            currentState.copy(searchQuery = query)
-        }
-    }
-
-    // --- FUNGSI TAMBAHAN UNTUK MENAMBAH KULINER BARU DARI FORM ---
     fun addKuliner(nama: String, lokasi: String) {
         val newItem = Kuliner(
             id = (_uiState.value.kulinerList.maxOfOrNull { it.id } ?: 0) + 1,
             nama = nama,
-            kategori = "Kuliner Baru",
-            harga = 25000,
+            kategori = "Makanan Berat", // Bisa disesuaikan
+            harga = 15000, // Bisa disesuaikan
             lokasi = lokasi,
-            deskripsi = "Tempat kuliner baru yang ditambahkan via form."
+            deskripsi = "Kuliner baru ditambahkan."
         )
 
         _uiState.update { currentState ->
-            currentState.copy(
-                kulinerList = currentState.kulinerList + newItem
-            )
+            currentState.copy(kulinerList = currentState.kulinerList + newItem)
         }
     }
 }

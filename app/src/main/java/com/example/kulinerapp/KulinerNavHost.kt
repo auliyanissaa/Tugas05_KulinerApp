@@ -3,19 +3,19 @@ package com.example.kulinerapp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.kulinerapp.ui.CatalogViewModel
+import com.example.kulinerapp.ui.FormScreen
 
 @Composable
 fun KulinerNavHost(
-    navController: NavHostController = rememberNavController(),
-    viewModel: CatalogViewModel = viewModel()
+    navController: NavHostController,
+    viewModel: CatalogViewModel
 ) {
+    // Mengonsumsi state menggunakan lifecycle-aware collection (Standar Pertemuan 6)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     NavHost(
@@ -25,9 +25,9 @@ fun KulinerNavHost(
         // 1. Home Destination
         composable<Screen.Home> {
             HomeScreen(
-                kulinerList = uiState.kulinerList,
-                onItemClick = { kulinerId ->
-                    navController.navigate(Screen.Detail(kulinerId))
+                kulinerList = uiState.kulinerList, // Pass the list from uiState
+                onItemClick = { kulinerId ->          // Match HomeScreen's onItemClick parameter
+                    navController.navigate(Screen.Detail(kulinerId = kulinerId))
                 },
                 onAddClick = {
                     navController.navigate(Screen.Form)
@@ -38,6 +38,7 @@ fun KulinerNavHost(
         // 2. Detail Destination
         composable<Screen.Detail> { backStackEntry ->
             val route: Screen.Detail = backStackEntry.toRoute()
+            // Menangani non-happy path / invalid ID sesuai ketentuan tugas
             val selectedKuliner = uiState.kulinerList.find { it.id == route.kulinerId }
 
             DetailScreen(
@@ -46,7 +47,7 @@ fun KulinerNavHost(
             )
         }
 
-        // 3. Form Destination
+        // 3. Form Destination (Menerima callback, tanpa memegang NavController langsung di ViewModel)
         composable<Screen.Form> {
             FormScreen(
                 onBackClick = { navController.popBackStack() },
